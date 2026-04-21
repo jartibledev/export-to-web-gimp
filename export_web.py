@@ -28,6 +28,7 @@ from gi.repository import Gimp
 gi.require_version('GimpUi', '3.0')
 from gi.repository import GimpUi
 from gi.repository import GLib
+import os 
 
 class ExportWeb (Gimp.PlugIn):
     def do_query_procedures(self):
@@ -83,10 +84,11 @@ class ExportWeb (Gimp.PlugIn):
         res_conf.set_property('yresolution', 72.0)
         res_proc.run(res_conf)
 
-        # 4. Prepare Export File (Convert string path to GFile)
-        # Note: You need a destination. For this example, I'll save to Desktop/web_export.jpg
-        export_path = GLib.get_user_special_dir(GLib.UserDirectory.DIRECTORY_DESKTOP) + "/web_export.jpg"
-        save_file = Gio.File.new_for_path(export_path)
+       
+        gfile = image.get_file()
+        basedir = os.path.dirname(gfile.get_path())
+        new_filename = os.path.join(basedir, "web_export.jpg")
+        save_file = Gio.File.new_for_path(new_filename)
 
         # 5. JPEG Export
         export_proc = Gimp.get_pdb().lookup_procedure('file-jpeg-export')
