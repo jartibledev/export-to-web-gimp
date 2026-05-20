@@ -21,6 +21,9 @@
 #   You should have received a copy of the GNU General Public License
 #   along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
+#!/usr/bin/env python3
+# -*- coding: utf-8 -*-
+
 import sys
 import gi
 gi.require_version('Gimp', '3.0')
@@ -29,7 +32,6 @@ gi.require_version('GimpUi', '3.0')
 from gi.repository import GimpUi
 from gi.repository import GLib
 import os 
-
 class ExportWeb (Gimp.PlugIn):
     def do_query_procedures(self):
         return [ "plugin-export-to-web" ]
@@ -38,13 +40,13 @@ class ExportWeb (Gimp.PlugIn):
         return False
 
     def do_create_procedure(self, name):
-      
+        # Using Gimp.RunMode.NONINTERACTIVE if you want it to run without popups
         procedure = Gimp.ImageProcedure.new(self, name,
                                             Gimp.PDBProcType.PLUGIN,
                                             self.run, None)
         procedure.set_image_types("*")
         procedure.set_menu_label("Export to web")
-        procedure.add_menu_path('<Image>/File/Export') 
+        procedure.add_menu_path('<Image>/File/Export') # Put it in File > Export
 
         procedure.set_documentation("Exports file optimized for web (< 2MB target)",
                                     "Plugin export to web",
@@ -53,7 +55,7 @@ class ExportWeb (Gimp.PlugIn):
         return procedure
 
     def run(self, procedure, run_mode, image, drawables, config, run_data):
-      
+        # GIMP 3.0 passes 'drawables' as a list/array
         
         # 1. Flatten Image
         flatten_proc = Gimp.get_pdb().lookup_procedure('gimp-image-flatten')
@@ -64,7 +66,7 @@ class ExportWeb (Gimp.PlugIn):
         width = image.get_width()
         height = image.get_height()
 
-       
+        # 2. Scale if too large
         if height > 3000:
             new_height = 3000
             new_width = int((width * new_height) / height)
@@ -76,7 +78,7 @@ class ExportWeb (Gimp.PlugIn):
             scale_conf.set_property('new-height', new_height)
             scale_proc.run(scale_conf)
 
-        
+        # 3. Set Resolution
         res_proc = Gimp.get_pdb().lookup_procedure('gimp-image-set-resolution')
         res_conf = res_proc.create_config()
         res_conf.set_property('image', image)
@@ -84,29 +86,45 @@ class ExportWeb (Gimp.PlugIn):
         res_conf.set_property('yresolution', 72.0)
         res_proc.run(res_conf)
 
-       
+        # 1. Obtener el archivo GFile de la imagen
         gfile = image.get_file()
-        basedir = os.path.dirname(gfile.get_path())
-        new_filename = os.path.join(basedir, "web_export.jpg")
+        
+        if gfile:
+            # Si la imagen ya tiene ruta (ya ha sido guardada antes)
+            complete_path = gfile.get_path()
+            basedir = os.path.dirname(complete_path)
+            name_with_extension = os.path.basename(complete_path)
+            # splitext devuelve (nombre, extensión). Nos quedamos con el índice [0]
+            name_without_extension = os.path.splitext(name_with_extension)[0]
+        else:
+            # Si es una imagen nueva ("Sin nombre"), guardamos en el Escritorio
+            basedir = GLib.get_user_special_dir(GLib.UserDirectory.DIRECTORY_DESKTOP)
+            name_without_extension = "web_export"
+
+        # 2. Definir el nuevo nombre del archivo con la extensión .jpg
+        new_filename = os.path.join(basedir, name_without_extension + ".jpg")
+        
+        # 3. Crear el objeto Gio.File que necesita GIMP 3
         save_file = Gio.File.new_for_path(new_filename)
 
-     
+        # 5. JPEG Export
+
+
         export_proc = Gimp.get_pdb().lookup_procedure('file-jpeg-export')
         save_conf = export_proc.create_config()
-        
         save_conf.set_property('image', image)
         save_conf.set_property('file', save_file)
         save_conf.set_property('run-mode', Gimp.RunMode.NONINTERACTIVE)
-        save_conf.set_property('quality', 80) 
+        save_conf.set_property('quality', 80) # 80% quality
         save_conf.set_property('optimize', True)
         save_conf.set_property('progressive', True)
-        save_conf.set_property('sub-sampling', 0) 
+        save_conf.set_property('sub-sampling', 0) # 0 is 4:4:4
         
         result = export_proc.run(save_conf)
 
         return procedure.new_return_values(Gimp.PDBStatusType.SUCCESS, GLib.Error())
 
-
+# Important: Add Gio import at the top for the file handling
 from gi.repository import Gio
 
 Gimp.main(ExportWeb.__gtype__, sys.argv)
