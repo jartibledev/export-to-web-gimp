@@ -54,7 +54,7 @@ The process will run non-interactively (in the background) to save you time and 
 
 ## ✍️ Authors
 
-* **Developers:** Maya López & Sergio
+* **Developers:** Sergio Maya López
 * **Year:** 2026
 
 ---
