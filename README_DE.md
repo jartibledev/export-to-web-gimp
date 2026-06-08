@@ -54,7 +54,7 @@ Der Prozess läuft im Hintergrund ab (nicht-interaktiv), um Ihnen Zeit und Klick
 
 ## ✍️ Autoren
 
-* **Entwickler:** Maya López & Sergio
+* **Entwickler:** Sergio Maya López
 * **Jahr:** 2026
 
 ---
