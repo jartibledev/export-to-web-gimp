@@ -54,7 +54,7 @@ Le processus s'exécutera en arrière-plan (mode non interactif) pour vous évit
 
 ## ✍️ Auteurs
 
-* **Développeurs :** Maya López & Sergio
+* **Développeurs :** Sergio Maya López
 * **Année :** 2026
 
 ---
