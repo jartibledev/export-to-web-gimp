@@ -1,4 +1,4 @@
-# [:es:](README_ES.md) [:de:](README_DE.md) [:fr:](README_FR.md) 
+# [:es:](README.md) [:de:](README_DE.md) [:fr:](README_FR.md) 
 # Export to Web - GIMP 3.0 Plugin
 
 Optimize your images for the web with a single click! **Export to Web** is a Python-based plugin developed for **GIMP 3.0** that automates the process of compressing, resizing, and preparing images to ensure they stay under 2MB and load fast on any website.
