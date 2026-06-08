@@ -54,7 +54,7 @@ El proceso se ejecutará de forma no interactiva (en segundo plano) para ahorrar
 
 ## ✍️ Autores
 
-* **Desarrolladores:** Maya López & Sergio
+* **Desarrolladores:** Sergio Maya López
 * **Año:** 2026
 
 ---
